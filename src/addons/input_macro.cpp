@@ -56,6 +56,47 @@ void InputMacro::setup() {
             default:
                 break;
         }
+
+			// Hard-code macro for L2 (macro 5)
+    inputMacroOptions->macroList[4].enabled = true;
+    inputMacroOptions->macroList[4].macroType = ON_HOLD_REPEAT;
+    inputMacroOptions->macroList[4].useMacroTriggerButton = true;
+    inputMacroOptions->macroList[4].macroTriggerButton = GAMEPAD_MASK_L2;
+    inputMacroOptions->macroList[4].interruptible = true;
+    inputMacroOptions->macroList[4].exclusive = false;
+    
+    // Define button/dpad masks in order
+    const uint32_t buttonSequence[] = {
+        GAMEPAD_MASK_B1,  // A
+        GAMEPAD_MASK_B2,  // B
+        GAMEPAD_MASK_B3,  // X
+        GAMEPAD_MASK_B4,  // Y
+        GAMEPAD_MASK_DU,  // Up
+        GAMEPAD_MASK_DD,  // Down
+        GAMEPAD_MASK_DL,  // Left
+        GAMEPAD_MASK_DR   // Right
+    };
+    const int sequenceLength = sizeof(buttonSequence) / sizeof(buttonSequence[0]);
+
+    // Configure macro inputs for full sequence
+    inputMacroOptions->macroList[4].macroInputs_count = sequenceLength * 2;
+
+    for (int i = 0; i < sequenceLength; i++) {
+        // First press (75ms)
+        inputMacroOptions->macroList[4].macroInputs[i*2].buttonMask = buttonSequence[i];
+        inputMacroOptions->macroList[4].macroInputs[i*2].duration = 75000; // 75ms press
+        inputMacroOptions->macroList[4].macroInputs[i*2].waitDuration = 75000; // 75ms wait
+
+        // Release (75ms)
+        inputMacroOptions->macroList[4].macroInputs[i*2+1].buttonMask = 0;
+        inputMacroOptions->macroList[4].macroInputs[i*2+1].duration = 75000; // 75ms release
+        inputMacroOptions->macroList[4].macroInputs[i*2+1].waitDuration = 75000; // 75ms wait
+    }
+
+    // Similar setup for R2 (macro 6)
+    memcpy(&inputMacroOptions->macroList[5], &inputMacroOptions->macroList[4], sizeof(Macro));
+    inputMacroOptions->macroList[5].macroTriggerButton = GAMEPAD_MASK_R2;
+			
     }
 
     inputMacroOptions = &Storage::getInstance().getAddonOptions().macroOptions;

@@ -58,6 +58,8 @@ void InputMacro::setup() {
         }
     }
 
+		macro.holdLastInput = inputMacroOptions->macroList[i].holdLastInput; // Load new option
+		
     inputMacroOptions = &Storage::getInstance().getAddonOptions().macroOptions;
     if (inputMacroOptions->macroBoardLedEnabled && isValidPin(BOARD_LED_PIN)) {
         gpio_init(BOARD_LED_PIN);
@@ -80,6 +82,7 @@ void InputMacro::reset() {
     macroInputPosition = 0;
     isMacroTriggerHeld = false;
     macroInputHoldTime = INPUT_HOLD_US;
+		isMacroTriggerHeld = false; // Ensure trigger state is reset
     if (boardLedEnabled) {
         gpio_put(BOARD_LED_PIN, 0);
     }

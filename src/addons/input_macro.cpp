@@ -199,6 +199,30 @@ void InputMacro::runCurrentMacro() {
         }
     }
 
+        // Check if the macro has the holdLastInput option enabled
+    if (macro.holdLastInput && macroInputPosition == macro.macroInputs_count - 1) {
+        // Ensure the last input stays pressed as long as the macro trigger button is held
+        if (isMacroTriggerHeld) {
+            uint32_t buttonMask = macroInput.buttonMask;
+
+            if (buttonMask & GAMEPAD_MASK_DU) gamepad->state.dpad |= GAMEPAD_MASK_UP;
+            if (buttonMask & GAMEPAD_MASK_DD) gamepad->state.dpad |= GAMEPAD_MASK_DOWN;
+            if (buttonMask & GAMEPAD_MASK_DL) gamepad->state.dpad |= GAMEPAD_MASK_LEFT;
+            if (buttonMask & GAMEPAD_MASK_DR) gamepad->state.dpad |= GAMEPAD_MASK_RIGHT;
+
+            gamepad->state.buttons |= buttonMask;
+
+            // Keep LED indicator active if applicable
+            if (boardLedEnabled) {
+                gpio_put(BOARD_LED_PIN, 1);
+            }
+
+            // Prevent progression beyond the last macro input while holding the trigger
+            return;
+        }
+    }
+
+
     // Have we elapsed the input hold time?
     if ((currentMicros - macroStartTime) >= macroInputHoldTime) {
         macroStartTime = currentMicros;

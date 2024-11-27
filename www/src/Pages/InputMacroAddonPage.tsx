@@ -32,29 +32,6 @@ const MACRO_TYPES = [
 	{ label: 'InputMacroAddon:input-macro-type.toggle', value: 3 },
 ];
 
-const schema = yup.object().shape({
-	macroList: yup.array().of(
-		yup.object().shape({
-			macroType: yup.number(),
-			macroLabel: yup.string(),
-			enabled: yup.number(),
-			exclusive: yup.number(),
-			interruptible: yup.number(),
-			showFrames: yup.number(),
-			useMacroTriggerButton: yup.number(),
-			macroTriggerButton: yup.number(),
-			macroInputs: yup.array().of(
-				yup.object().shape({
-					buttonMask: yup.number(),
-					duration: yup.number(),
-					waitDuration: yup.number(),
-				}),
-			),
-		}),
-	),
-	macroBoardLedEnabled: yup.number(),
-});
-
 const MACRO_INPUTS_MAX = 30;
 
 const MACRO_LIMIT = 6;
@@ -75,12 +52,37 @@ const defaultValues = {
 		showFrames: 1,
 		useMacroTriggerButton: 0,
 		macroTriggerButton: 0,
+		holdLastInput: 0,  // New property
 		macroInputs: [defaultMacroInput],
 	}),
 	macroBoardLedEnabled: 0,
 };
 
 const ONE_FRAME_US = 16666;
+
+const schema = yup.object().shape({
+	macroList: yup.array().of(
+		yup.object().shape({
+			macroType: yup.number(),
+			macroLabel: yup.string(),
+			enabled: yup.number(),
+			exclusive: yup.number(),
+			interruptible: yup.number(),
+			showFrames: yup.number(),
+			useMacroTriggerButton: yup.number(),
+			macroTriggerButton: yup.number(),
+			holdLastInput: yup.number(),  // Add validation for new property
+			macroInputs: yup.array().of(
+				yup.object().shape({
+					buttonMask: yup.number(),
+					duration: yup.number(),
+					waitDuration: yup.number(),
+				}),
+			),
+		}),
+	),
+	macroBoardLedEnabled: yup.number(),
+});
 
 const FormContext = () => {
 	const { values, setValues } = useFormikContext();
@@ -112,11 +114,9 @@ const ButtonMasksComponent = (props) => {
 		buttonMasks,
 	} = props;
 	return (
-		// <div key={key} className={className}>
 		<Form.Select
 			size="sm"
 			name={`${key}.buttonMask`}
-			// className="form-control"
 			value={value}
 			error={error}
 			isInvalid={isInvalid}
@@ -128,7 +128,6 @@ const ButtonMasksComponent = (props) => {
 				</option>
 			))}
 		</Form.Select>
-		// </div>
 	);
 };
 
@@ -274,6 +273,7 @@ const MacroComponent = (props) => {
 			showFrames,
 			useMacroTriggerButton,
 			macroTriggerButton,
+			holdLastInput,  // New property
 		},
 		errors,
 		handleChange,
@@ -384,7 +384,23 @@ const MacroComponent = (props) => {
 						onChange={(e) => {
 							setFieldValue(
 								`${key}.useMacroTriggerButton`,
-								e.target.checked ? 1 : 0,
+								e.target.checked ? 1 : 0
+							);
+						}}
+						isInvalid={false}
+					/>
+				</Col>
+				<Col sm={'auto'}>
+					<Form.Check
+						name={`${key}.holdLastInput`}
+						label={t('InputMacroAddon:input-macro-macro-hold-last-button')}
+						type="switch"
+						className="form-select-sm"
+						checked={holdLastInput}
+						onChange={(e) => {
+							setFieldValue(
+								`${key}.holdLastInput`,
+								e.target.checked ? 1 : 0
 							);
 						}}
 						isInvalid={false}

@@ -58,6 +58,7 @@ private:
 	uint32_t macroInputHoldTime;
 	bool prevMacroInputPressed;
 	bool boardLedEnabled;
+	bool holdLastInput; // Flag to keep the last button pressed
 	MacroOptions * inputMacroOptions;
 };
 
